@@ -28,13 +28,13 @@ let checkExpireViaRead = function (info = {}, key) {
 };
 
 export let store = Storage;
-export let expire = {
+export let cache = {
 
   remove: function (key) {
     Storage.remove(key);
   },
-  set: function (key, val, {exp = -1, read = -1}) {
-    let expTime = exp === -1 ? -1 : exp * (60 * 1000);
+  set: function (key, val, {time = -1, read = -1}) {
+    let expTime = time === -1 ? -1 : time * 1000;
 
     Storage.set(key, {
       val: val,
@@ -82,6 +82,7 @@ export let expire = {
       return null;
     }
 
+    // 读取次数策略
     let data = checkExpireViaRead(info, key);
 
     if (data) {

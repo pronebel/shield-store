@@ -1,12 +1,11 @@
-import Storage from 'store';
+import Storage from "store";
 
 let checkExpireViaTime = function (info = {}, key) {
-  if (info.exp !== -1 && (new Date().getTime() - info.time > info.exp)) {
+  if (info.exp !== -1 && new Date().getTime() - info.time > info.exp) {
     Storage.remove(key);
     return null;
   }
   return info;
-
 };
 
 let checkExpireViaRead = function (info = {}, key) {
@@ -21,19 +20,16 @@ let checkExpireViaRead = function (info = {}, key) {
     }
 
     return info;
-
   }
   return info;
-
 };
 
 export let store = Storage;
 export let cache = {
-
   remove: function (key) {
     Storage.remove(key);
   },
-  set: function (key, val, {time = -1, read = -1}) {
+  set: function (key, val, { time = -1, read = -1 }) {
     let expTime = time === -1 ? -1 : time * 1000;
 
     Storage.set(key, {
@@ -43,28 +39,29 @@ export let cache = {
       read: read
     });
 
-    if (expTime > 0) {
-      let curStore = Storage.get('EXPIRE_STORE') || [];
+    if (expTime > 0 || read > 0) {
+      let curStore = Storage.get("EXPIRE_STORE") || [];
 
       curStore.push(key);
-      Storage.set('EXPIRE_STORE', curStore);
+      Storage.set("EXPIRE_STORE", curStore);
     }
   },
-  clearForce() {
-    let curStore = Storage.get('EXPIRE_STORE') || [];
+  clearAll() {
+    let curStore = Storage.get("EXPIRE_STORE") || [];
 
     for (let i = 0; i < curStore.length; i++) {
       let key = curStore[i];
 
       Storage.remove(key);
     }
-    Storage.remove('EXPIRE_STORE');
+    Storage.remove("EXPIRE_STORE");
   },
   clear() {
-    let curStore = Storage.get('EXPIRE_STORE') || [];
+    let curStore = Storage.get("EXPIRE_STORE") || [];
 
     for (let i = 0; i < curStore.length; i++) {
       let key = curStore[i];
+
       let info = Storage.get(key);
 
       checkExpireViaTime(info, key);
@@ -89,6 +86,5 @@ export let cache = {
       return data.val;
     }
     return null;
-
   }
 };
